@@ -1,5 +1,20 @@
 //Listeners
-const display = document;
+const display = document.querySelector('.display');
+const buttons = document.querySelectorAll('.button');
+
+const buttonPress = (button) => {
+  if (button === 'C') {
+    display.textContent = '';
+  } else {
+    display.textContent = button;
+  }
+};
+
+buttons.forEach((button) =>
+  button.addEventListener('click', function () {
+    buttonPress(button.textContent);
+  })
+);
 
 // Functions
 const sum = (a, b) => a + b;
