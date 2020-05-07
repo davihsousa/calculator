@@ -1,14 +1,44 @@
-//Listeners
+const memory = {
+  number: '',
+  operator: '',
+  trigger: false,
+};
+
+//Events
 const display = document.querySelector('.display');
 const buttons = document.querySelectorAll('.button');
 
+const show = () => (display.textContent = memory.number);
+
 const buttonPress = (button) => {
   if (button === 'C') {
-    display.textContent = '';
-  } else {
-    display.textContent = button;
+    clear();
+  } else if (button.match(/\d/g)) {
+    if (memory.trigger) {
+      display.textContent = button;
+      memory.trigger = false;
+    } else {
+      display.textContent += button;
+    }
+  } else if (button.match(/\/|\*|\-|\+/g)) {
+    memory.operator = button;
+    memory.trigger = true;
+    memory.number = evaluate();
+    show();
+  } else if (button === '=') {
+    memory.number = operate(
+      memory.number,
+      display.textContent,
+      memory.operator
+    );
+    show();
   }
+  console.log(memory);
 };
+
+function evaluate() {
+  operate(memory.number, display.textContent, memory.operator);
+}
 
 buttons.forEach((button) =>
   button.addEventListener('click', function () {
@@ -16,20 +46,22 @@ buttons.forEach((button) =>
   })
 );
 
-// Functions
-const sum = (a, b) => a + b;
-const subtract = (a, b) => a - b;
-const multiply = (a, b) => a * b;
-const divide = (a, b) => a / b;
-const operate = (a, b, operator) => {
+function operate(a, b, operator) {
   switch (operator) {
     case '+':
-      return sum(a, b);
+      return Number(a) + Number(b);
     case '-':
-      return subtract(a, b);
+      return a - b;
     case '*':
-      return multiply(a, b);
+      return a * b;
     case '/':
-      return divide(a, b);
+      return a / b;
   }
-};
+}
+
+function clear() {
+  display.textContent = '';
+  memory.number = '';
+  memory.operator = '';
+  memory.trigger = false;
+}
