@@ -1,5 +1,6 @@
 const memory = {
-  number: '',
+  number1: '',
+  number2: '',
   operator: '',
   trigger: false,
 };
@@ -8,43 +9,44 @@ const memory = {
 const display = document.querySelector('.display');
 const buttons = document.querySelectorAll('.button');
 
-const show = () => (display.textContent = memory.number);
-
-const buttonPress = (button) => {
-  if (button === 'C') {
-    clear();
-  } else if (button.match(/\d/g)) {
-    if (memory.trigger) {
-      display.textContent = button;
-      memory.trigger = false;
-    } else {
-      display.textContent += button;
-    }
-  } else if (button.match(/\/|\*|\-|\+/g)) {
-    memory.operator = button;
-    memory.trigger = true;
-    memory.number = evaluate();
-    show();
-  } else if (button === '=') {
-    memory.number = operate(
-      memory.number,
-      display.textContent,
-      memory.operator
-    );
-    show();
+function numberPress(digit) {
+  if (!memory.trigger) {
+    display.textContent += digit;
+  } else {
+    display.textContent = digit;
+    memory.trigger = false;
   }
-  console.log(memory);
-};
+}
 
-function evaluate() {
-  operate(memory.number, display.textContent, memory.operator);
+function symbolPress(button) {
+  memory.number2 = display.textContent;
+  let result = operate(memory.number1, memory.number2, memory.operator);
+  display.textContent = result;
+  memory.number1 = result;
+  memory.operator = button;
+  memory.trigger = true;
 }
 
 buttons.forEach((button) =>
   button.addEventListener('click', function () {
-    buttonPress(button.textContent);
+    if (button.textContent === 'C') {
+      clear();
+    } else if (button.textContent.match(/\d|\./g)) {
+      numberPress(button.textContent);
+    } else if (button.textContent.match(/\/|\*|\-|\+|\=/g)) {
+      symbolPress(button.textContent);
+    }
+    console.log(memory);
   })
 );
+
+function clear() {
+  display.textContent = '';
+  memory.number1 = '';
+  memory.number2 = '';
+  memory.operator = '';
+  memory.trigger = false;
+}
 
 function operate(a, b, operator) {
   switch (operator) {
@@ -56,12 +58,7 @@ function operate(a, b, operator) {
       return a * b;
     case '/':
       return a / b;
+    default:
+      return display.textContent;
   }
-}
-
-function clear() {
-  display.textContent = '';
-  memory.number = '';
-  memory.operator = '';
-  memory.trigger = false;
 }
